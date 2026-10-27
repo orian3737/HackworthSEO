@@ -223,3 +223,7 @@ footer .fine{margin-top:56px;padding-top:24px;border-top:1px solid rgba(212,188,
 .notice h1{font-family:var(--display);font-weight:400;color:var(--oxblood);font-size:clamp(32px,4.2vw,50px);line-height:1.1;margin:16px auto 0;max-width:720px}
 .notice p.lede{max-width:560px;margin:22px auto 0;color:var(--olive-text)}
 .notice .actions{margin-top:44px}
+
+/* principal portrait inside the monogram frame */
+.monogram.portrait{overflow:hidden}
+.monogram.portrait img{width:100%;height:100%;object-fit:cover}
