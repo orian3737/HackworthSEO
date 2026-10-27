@@ -2,8 +2,6 @@
 
 The single-page marketing site for **Hackworth.exe, LLC**, a boutique SEO firm in Connecticut. It is plain static HTML, CSS and a little vanilla JavaScript: no framework, no build step, no npm dependencies, and no third-party scripts. It is hosted on Netlify.
 
-`hackworth-mockup.html` is the approved design mockup and remains the source of truth for colors, type, spacing and copy.
-
 ## File structure
 
 ```
@@ -18,7 +16,6 @@ assets/img/og-image.png    1200×630 social sharing image
 robots.txt
 sitemap.xml                Update <lastmod> when the page content changes
 netlify.toml               Publish settings, security headers, asset caching, www → apex redirect
-hackworth-mockup.html      Approved design mockup (reference only)
 ```
 
 ## Run locally
