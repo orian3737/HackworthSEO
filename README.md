@@ -42,9 +42,9 @@ The form uses Netlify Forms (`name="inquiry"`, with a `company_website` honeypot
 - **Email notifications:** in the Netlify dashboard go to **Site configuration → Forms → Form notifications → Add notification → Email**, then enter the address that should receive inquiries.
 - **Submissions** also appear under the site's **Forms** tab.
 
-## Add a client
+## Clientele
 
-In `index.html`, find the Clientele section (`#clients`) and duplicate one `<article class="client">` block inside `<div class="clients">`, then edit its sector label, name, location line, description and the Engagement and Scope entries. The grid wraps automatically.
+The Clientele section describes kinds of clients, never named clients. To add a sector, duplicate one `<article class="client">` block in `index.html` and keep the 'We handle' / 'We protect' structure. Client names must never be published.
 
 ## Design tokens
 
