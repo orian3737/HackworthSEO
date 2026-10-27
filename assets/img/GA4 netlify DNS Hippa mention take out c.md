@@ -1,1 +1,0 @@
-GA4  netlify DNS  Hippa mention take out clients names and describe what we do for each type of client, endorse our security and saftey with their Data 

@@ -18,6 +18,10 @@ sitemap.xml                Update <lastmod> when the page content changes
 netlify.toml               Publish settings, security headers, asset caching, www → apex redirect
 ```
 
+## Updating CSS or JavaScript
+
+All three pages load `site.css?v=N` and `site.js?v=N`. Whenever you change either file, raise `N` in `index.html`, `thank-you/index.html` and `404.html` so that returning visitors fetch the new version. Fonts are cached for a year; everything else revalidates on each visit.
+
 ## Run locally
 
 From the repository root, run either of these:

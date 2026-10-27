@@ -147,7 +147,7 @@ section{padding:104px 0}
 @media (max-width:960px){.principles{grid-template-columns:1fr}.principles p{border-left:0;border-top:1px solid var(--vellum-line)}.principles p:first-child{border-top:0}}
 
 /* clients */
-.clients{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.clients{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
 .client{border:1px solid var(--vellum-line);background:var(--ivory);padding:38px 32px 34px;position:relative;display:flex;flex-direction:column}
 .client .sector{margin-bottom:14px}
 .client h3{font-family:var(--display);font-weight:400;font-size:30px;margin:0;line-height:1.1;color:var(--ink)}

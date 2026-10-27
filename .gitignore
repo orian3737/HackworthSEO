@@ -1,0 +1,4 @@
+# Private working files: never publish (Netlify serves the repo root)
+assets/img/00009-headshot.jpg.jpeg.jpg
+*.md
+!README.md
