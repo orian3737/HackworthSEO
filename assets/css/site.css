@@ -75,17 +75,18 @@ section{padding:104px 0}
 .divider{padding:0}
 .divider .wrap{padding-top:0;padding-bottom:0}
 
-/* practice: set as a single document */
-.charter{position:relative;max-width:820px;margin:0 auto;padding:76px 88px 80px;background:var(--ivory);border:1px solid var(--brass);box-shadow:0 22px 44px -30px rgba(72,19,19,.35)}
+/* practice: articles in two columns, divided like a charter */
+.charter{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--ivory);border:1px solid var(--brass);padding:64px 24px}
 .charter::after{content:"";position:absolute;inset:6px;border:1px solid var(--vellum-line);pointer-events:none}
-.article{position:relative;z-index:1;text-align:center}
-.article h3{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.15;color:var(--ink);margin:12px 0 0}
-.article .preamble{font-style:italic;font-size:18px;color:var(--olive-text);max-width:30em;margin:12px auto 0}
-.clauses{list-style:none;counter-reset:clause;display:table;margin:26px auto 0;padding:0;text-align:left}
-.clauses li{counter-increment:clause;position:relative;padding:5px 0 5px 34px;line-height:1.55}
-.clauses li::before{content:counter(clause,lower-alpha) ".";position:absolute;left:0;top:5px;width:22px;text-align:right;font-style:italic;color:var(--brass-text)}
-.charter-mark{max-width:200px;margin:52px auto;position:relative;z-index:1}
-@media (max-width:700px){.charter{padding:48px 26px 52px}.article h3{font-size:27px}.charter-mark{margin:40px auto}}
+.article{position:relative;z-index:1;text-align:center;padding:8px 28px}
+.article:nth-of-type(odd){border-right:1px solid var(--brass)}
+.article h3{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.15;color:var(--ink);margin:12px 0 0}
+.article .preamble{font-style:italic;font-size:17px;color:var(--olive-text);max-width:26em;margin:10px auto 0}
+.clauses{list-style:none;counter-reset:clause;display:table;margin:24px auto 0;padding:0;text-align:left}
+.clauses li{counter-increment:clause;position:relative;padding:4px 0 4px 34px;font-size:16px;line-height:1.55}
+.clauses li::before{content:counter(clause,lower-alpha) ".";position:absolute;left:0;top:4px;width:22px;text-align:right;font-style:italic;color:var(--brass-text)}
+.charter-mark{grid-column:1/-1;margin:56px 0;position:relative;z-index:1}
+@media (max-width:860px){.charter{grid-template-columns:1fr;padding:48px 26px}.article{padding:0}.article:nth-of-type(odd){border-right:0}.article + .article{margin-top:52px}.charter-mark{margin:52px 0}}
 
 /* approach */
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;counter-reset:s}
