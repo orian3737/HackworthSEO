@@ -118,6 +118,7 @@ section{padding:104px 0}
 .tier h3{font-family:var(--display);font-weight:400;font-size:30px;margin:0;line-height:1.1}
 .tier .price{font-family:var(--display);font-size:62px;line-height:1;margin:26px 0 4px;color:var(--oxblood)}
 .tier.featured .price{color:var(--ivory)}
+.tier .price-words{font-size:38px;min-height:62px;display:flex;align-items:center;justify-content:center}
 .tier .per{font-style:italic;font-size:15px;color:var(--olive-text)}
 .tier.featured .per,.tier.featured li{color:#E4D9C3}
 .tier .rule{width:60px;margin:26px auto;border-top:3px double var(--brass)}
