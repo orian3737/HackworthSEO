@@ -19,7 +19,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
 <link rel="preload" href="/assets/fonts/libre-caslon-display-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/libre-caslon-text-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/site.css?v=4">
+<link rel="stylesheet" href="/assets/css/site.css?v=6">
 <noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
 <script type="application/ld+json">
 {
@@ -41,7 +41,7 @@
     { "@type": "Offer", "name": "Standard", "price": "395", "priceCurrency": "USD", "priceSpecification": { "@type": "UnitPriceSpecification", "price": "395", "priceCurrency": "USD", "unitText": "MONTH" } },
     { "@type": "Offer", "name": "Business Plus", "price": "700", "priceCurrency": "USD", "priceSpecification": { "@type": "UnitPriceSpecification", "price": "700", "priceCurrency": "USD", "unitText": "MONTH" } },
     { "@type": "Offer", "name": "Private Office", "price": "3000", "priceCurrency": "USD", "priceSpecification": { "@type": "UnitPriceSpecification", "price": "3000", "priceCurrency": "USD", "unitText": "MONTH" } },
-    { "@type": "Offer", "name": "Foundation Project", "price": "1500", "priceCurrency": "USD" },
+    { "@type": "Offer", "name": "Foundation Project", "description": "Fixed one-time fee, quoted after consultation" },
     { "@type": "Offer", "name": "By the Hour", "price": "85", "priceCurrency": "USD", "priceSpecification": { "@type": "UnitPriceSpecification", "price": "85", "priceCurrency": "USD", "unitText": "HOUR" } }
   ]}
 </script>
@@ -136,8 +136,7 @@
       <div class="steps">
         <div class="step reveal"><span class="roman">I</span><div class="rule"></div><h3>Review</h3><p>We inherit your existing accounts, speak with any prior provider, and preserve your search history.</p></div>
         <div class="step reveal"><span class="roman">II</span><div class="rule"></div><h3>Foundation</h3><p>A fixed-scope project that corrects titles, listings, locations and FAQs, typically within two to three weeks.</p></div>
-        <div class="step reveal"><span class="roman">III</span><div class="rule"></div><h3>Stewardship</h3><p>Standard or Business Plus: monthly monitoring and maintenance as Google, WordPress and your practice change.</p></div>
-        <div class="step reveal"><span class="roman">IV</span><div class="rule"></div><h3>Account</h3><p>A concise report each month: what we found, what we did, and what comes next.</p></div>
+        <div class="step reveal"><span class="roman">III</span><div class="rule"></div><h3>Stewardship</h3><p>Standard or Business Plus: ongoing monitoring and maintenance as Google, WordPress and your practice change, with a report each month on what we found and what needs attention.</p></div>
       </div>
     </div>
   </section>
@@ -149,21 +148,21 @@
       <header class="head reveal">
         <p class="label"><span class="numeral">III</span> &nbsp;·&nbsp; Security</p>
         <h2>Trusted with what matters most</h2>
-        <p>Our clients hold patient records, privileged matters and controlled work. We treat every login, report and file in our keeping as though our own reputation depended on it, because it does.</p>
+        <p>Our clients trust us with sensitive accounts and a reputation they have spent years building. We treat every login, report and file in our keeping as though our own reputation depended on it, because it does.</p>
       </header>
       <div class="security-panel reveal">
         <div class="commitments">
           <div class="commitment">
             <h3>Your accounts, your keys</h3>
-            <p>Your domain, website, listings and analytics stay in accounts you own. We work through separate access you grant, never your primary passwords.</p>
+            <p>Your domain, website, listings and analytics stay in accounts you own. Wherever possible, we work through separate access of our own.</p>
           </div>
           <div class="commitment">
-            <h3>Least access, always</h3>
-            <p>We request only the access an engagement requires, and our work never reaches beyond your public website and listings.</p>
+            <h3>Ahead of the threats</h3>
+            <p>When a new vulnerability surfaces, such as a zero-day in the software your site runs on, we are already watching. We follow current security practice and patch promptly, so you rarely have to face it yourself.</p>
           </div>
           <div class="commitment">
             <h3>Sensitive data stays out</h3>
-            <p>Analytics are configured so that names, health information, case details and form contents are never collected or passed to third parties.</p>
+            <p>Analytics are configured so that names, personal details and form contents are never collected or passed to third parties.</p>
           </div>
           <div class="commitment">
             <h3>Confidential by contract</h3>
@@ -175,10 +174,9 @@
           </div>
           <div class="commitment">
             <h3>A clean departure</h3>
-            <p>When an engagement ends, we remove our access and return every account, setting and record that belongs to you.</p>
+            <p>If an engagement ends, we remove our access and return every account, setting and record that belongs to you.</p>
           </div>
         </div>
-        <p class="security-note">We will never ask you to send patient information, case details or controlled technical data.</p>
       </div>
     </div>
   </section>
@@ -187,9 +185,21 @@
     <div class="wrap">
       <header class="head reveal">
         <p class="label"><span class="numeral">IV</span> &nbsp;·&nbsp; Engagements</p>
-        <h2>Engagements scaled to your practice</h2>
-        <p>Boutique attention, at fees that are surprisingly within reach. Every engagement is stated in writing before work begins.</p>
+        <h2 class="sr-only">Engagements</h2>
       </header>
+      <div class="extras reveal">
+        <div>
+          <p class="label">A fixed project, quoted on consultation</p>
+          <h3>Foundation</h3>
+          <p>A single, fixed fee agreed after an initial consultation, typically for two to three weeks of work. We audit where your site stands today and settle the scope with you, so that any monthly care begins from sound footing.</p>
+        </div>
+        <div>
+          <p class="label">As needed</p>
+          <h3>By the hour &nbsp;<span>$85</span></h3>
+          <p>Targeted fixes and emergency maintenance: security patches, updates and hotfixes applied promptly to keep downtime to a minimum. No hour is billed without your written approval.</p>
+        </div>
+      </div>
+
       <div class="tiers">
         <article class="tier reveal">
           <p class="label">Monthly care</p>
@@ -243,26 +253,6 @@
         </article>
       </div>
 
-      <div class="extras reveal">
-        <div>
-          <p class="label">A fixed project</p>
-          <h3>Foundation &nbsp;<span>$1,500</span></h3>
-          <p>Up to eighteen hours over two to three weeks: title tags rewritten across every page, Google Business Profile verified and duplicates resolved, service areas and FAQs clarified. Often the first step before a monthly engagement.</p>
-        </div>
-        <div>
-          <p class="label">As needed</p>
-          <h3>By the hour &nbsp;<span>$85</span></h3>
-          <p>Targeted fixes, one-off improvements and work beyond a monthly scope. No hour is billed without your written approval.</p>
-        </div>
-      </div>
-
-      <div class="principles reveal" aria-label="House principles">
-        <p><strong>Your approval first</strong>No work beyond the agreed scope is billed without your written approval.</p>
-        <p><strong>Your assets remain yours</strong>Domain, website, listings, analytics and data stay in accounts you control.</p>
-        <p><strong>No long contracts</strong>Monthly engagements continue month to month, with thirty days' notice.</p>
-        <p><strong>Honest reporting</strong>A phone click is reported as a contact attempt, never inflated into a lead.</p>
-        <p><strong>No promised rankings</strong>Search engines are not ours to command. We promise care, not positions.</p>
-      </div>
     </div>
   </section>
 
@@ -273,54 +263,14 @@
         <h2>In good company</h2>
         <p>A deliberately small roster, so that every client receives the attention of the principals.</p>
       </header>
-      <!-- Each card describes a kind of client. Client names are never published. -->
-      <div class="clients">
-        <article class="client reveal">
-          <p class="label sector">Law firms</p>
-          <h3>Visible where clients look first</h3>
-          <p class="where">Solo practitioners to regional firms</p>
-          <div class="rule"></div>
-          <p>Prospective clients search before they call. We keep your listings accurate, your practice-area pages clear, and your reporting honest about which clicks became genuine inquiries.</p>
-          <dl>
-            <dt>We handle</dt><dd>Local search, practice-area pages, Google Business Profile, Apple Business, GA4, Search Console and monthly reporting</dd>
-            <dt>We protect</dt><dd>Case details, privileged communications and client identities never enter analytics or advertising platforms</dd>
-          </dl>
-        </article>
-        <article class="client reveal">
-          <p class="label sector">Medical practices</p>
-          <h3>Found by the patients you serve</h3>
-          <p class="where">Private practices, specialists and telehealth providers</p>
-          <div class="rule"></div>
-          <p>Patients choose by proximity and trust. We make sure your offices, service areas and in-person or telehealth options are stated plainly and consistently wherever patients search.</p>
-          <dl>
-            <dt>We handle</dt><dd>Title tags, Google Business Profile, duplicate listings, service areas, FAQs and image optimization</dd>
-            <dt>We protect</dt><dd>Analytics are configured never to collect names, health information or form contents</dd>
-          </dl>
-        </article>
-        <article class="client reveal">
-          <p class="label sector">Defense contractors</p>
-          <h3>A public face, carefully kept</h3>
-          <p class="where">Contractors, suppliers and specialist firms</p>
-          <div class="rule"></div>
-          <p>Primes, agencies and partners vet you online before they call. We keep your capability pages, local presence and technical site health as precise as your work.</p>
-          <dl>
-            <dt>We handle</dt><dd>Capability pages, local presence, technical SEO, site health and indexing</dd>
-            <dt>We protect</dt><dd>Our work is confined to your public website and listings. We never request access to internal systems or controlled technical data</dd>
-          </dl>
-        </article>
-        <article class="client reveal">
-          <p class="label sector">Every other business</p>
-          <h3>Any business worth finding</h3>
-          <p class="where">Retail, trades, hospitality, nonprofits and professional services</p>
-          <div class="rule"></div>
-          <p>These three fields are where we began, not where we stop. If your customers search for you, the same careful work applies, scoped to what your business actually needs.</p>
-          <dl>
-            <dt>We handle</dt><dd>Local search, technical SEO, Google Business Profile, Apple Business, GA4, Search Console and monthly reporting</dd>
-            <dt>We protect</dt><dd>Your accounts, your customers' data and your reputation, with the same discretion every client receives</dd>
-          </dl>
-        </article>
+      <!-- Kinds of clients only. Client names are never published. -->
+      <div class="roster reveal">
+        <ul class="roster-list" aria-label="Kinds of clients we serve">
+          <li>Law firms</li><li>Medical practices</li><li>Defense contractors</li><li>Startups</li><li>Local businesses</li>
+        </ul>
+        <div class="rule"></div>
+        <p>Different fields, one common need. Whatever brings someone to your name, a recommendation, a pitch or an advertisement, they will search for you before they call. We make that moment effortless, so that everything else you do to earn their trust can do its work.</p>
       </div>
-      <p class="clients-note reveal">We do not publish the names of the firms we serve. Discretion begins with us.</p>
     </div>
   </section>
 
@@ -359,7 +309,6 @@
         <h2>Begin with a private conversation</h2>
         <p>Tell us a little about your practice. A principal will reply personally, usually within one business day, to arrange a short consultation at no charge.</p>
         <p>There is no obligation, and nothing is billed until an engagement is agreed in writing.</p>
-        <p class="note">Please do not include patient information, case details or controlled technical data in this form.</p>
       </div>
       <form class="reveal" name="inquiry" method="POST" action="/thank-you/" data-netlify="true" netlify-honeypot="company_website">
         <input type="hidden" name="form-name" value="inquiry">
@@ -375,10 +324,12 @@
         <div class="field"><label for="f-sector">Your field</label>
           <select id="f-sector" name="sector" required>
             <option value="" disabled selected>Select one</option>
-            <option>Medical practice</option>
             <option>Law firm</option>
-            <option>Defense contractor</option>
-            <option>Other business</option>
+            <option>Medical practice</option>
+            <option>Contractor</option>
+            <option>Startup</option>
+            <option>Local business</option>
+            <option>Other</option>
           </select>
         </div>
         <div class="field"><label for="f-interest">Engagement of interest</label>
@@ -387,7 +338,7 @@
             <option>Standard, $395 per month</option>
             <option>Business Plus, $700 per month</option>
             <option>Private Office, $3,000 per month</option>
-            <option>Foundation project, $1,500</option>
+            <option>Foundation project</option>
             <option>By the hour, $85</option>
           </select>
         </div>

@@ -48,7 +48,7 @@ The form uses Netlify Forms (`name="inquiry"`, with a `company_website` honeypot
 
 ## Clientele
 
-The Clientele section describes kinds of clients, never named clients. To add a sector, duplicate one `<article class="client">` block in `index.html` and keep the 'We handle' / 'We protect' structure. Client names must never be published.
+The Clientele section mentions the kinds of clients the firm serves (the `.roster-list` in `index.html`), never named clients. To add a kind of client, add an `<li>` to that list. Client names must never be published.
 
 ## Design tokens
 
