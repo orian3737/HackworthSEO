@@ -154,16 +154,14 @@ section{padding:104px 0}
 @media (max-width:620px){.roster{padding:42px 24px 46px}.roster p{font-size:17px}}
 
 /* principals */
-.principals{display:grid;grid-template-columns:repeat(2,1fr);gap:60px;max-width:960px;margin:0 auto}
-.person{display:grid;grid-template-columns:112px 1fr;gap:28px;align-items:start}
-.monogram{width:112px;height:112px;border:1px solid var(--brass);display:grid;place-items:center;position:relative;background:var(--ivory)}
+.principals{display:grid;grid-template-columns:1fr;gap:56px;max-width:860px;margin:0 auto}
+.person{display:grid;grid-template-columns:160px 1fr;gap:40px;align-items:start}
+.monogram{width:160px;height:160px;border:1px solid var(--brass);display:grid;place-items:center;position:relative;background:var(--ivory)}
 .monogram::after{content:"";position:absolute;inset:5px;border:1px solid var(--brass)}
-.monogram span{font-family:var(--display);font-size:40px;color:var(--oxblood);letter-spacing:.02em}
 .person h3{font-family:var(--display);font-weight:400;font-size:30px;margin:0;line-height:1.1}
 .person .title{margin:8px 0 16px}
 .person p{margin:0;color:var(--ink)}
-@media (max-width:860px){.principals{grid-template-columns:1fr;gap:48px}}
-@media (max-width:460px){.person{grid-template-columns:1fr}.monogram{width:96px;height:96px}}
+@media (max-width:600px){.person{grid-template-columns:1fr;gap:24px}}
 
 /* inquiry */
 .inquire{display:grid;grid-template-columns:5fr 7fr;gap:72px;align-items:start}
