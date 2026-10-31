@@ -63,7 +63,7 @@ async function sendWithResend(apiKey, idempotencyKey, body) {
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(
-      `Resend ${response.status} for ${body.template.id}: ${JSON.stringify(result)}`
+      `Resend ${response.status} for ${body.template?.id || "plain email"}: ${JSON.stringify(result)}`
     );
   }
   return result;
@@ -119,13 +119,31 @@ export const handler = async (event) => {
     SUBMITTED_AT: submittedAt,
   });
 
+  const leadEnvelope = {
+    from: FROM_LEADS,
+    to: TEAM,
+    ...(hasValidEmail ? { reply_to: email } : {}),
+    subject: `[Lead] ${practice || "New inquiry"} · Ref ${submissionId}`,
+  };
+
+  // If the lead template can't be used (for example, it is still a draft), the team
+  // still gets the lead as a plain-text email rather than nothing.
+  const leadText = [
+    ["Name", name], ["Practice or firm", practice], ["Email", email], ["Telephone", phone],
+    ["Field", field], ["Engagement of interest", engagement], ["Message", message],
+    ["Submitted", submittedAt], ["Reference", submissionId],
+  ].filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`).join("\n");
+
   const sends = [
     sendWithResend(apiKey, `hackworth-lead/${submissionId}`, {
-      from: FROM_LEADS,
-      to: TEAM,
-      ...(hasValidEmail ? { reply_to: email } : {}),
-      subject: `[Lead] ${practice || "New inquiry"} · Ref ${submissionId}`,
+      ...leadEnvelope,
       template: { id: TEMPLATE_NEW_LEAD, variables: leadVariables },
+    }).catch((err) => {
+      console.error(`Lead template failed, sending plain lead instead. ${err.message}`);
+      return sendWithResend(apiKey, `hackworth-lead-plain/${submissionId}`, {
+        ...leadEnvelope,
+        text: `${leadText}\n\nReply to this email to respond to the client directly.`,
+      });
     }),
   ];
 
