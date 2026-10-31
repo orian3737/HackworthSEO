@@ -1,5 +1,5 @@
 // Runs automatically after Netlify accepts a form submission (spam is filtered out first).
-// Emails each inquiry to the firm through Resend. Configure in Netlify → Site configuration
+// Emails each inquiry to the firm, and sends the client the Resend confirmation template. Configure in Netlify → Site configuration
 // → Environment variables: RESEND_API_KEY (secret), INQUIRY_TO (comma-separated), INQUIRY_FROM.
 
 const FIELDS = [
@@ -17,6 +17,31 @@ const escapeHtml = (s) =>
 
 // Keep header values to a single line.
 const oneLine = (s) => String(s || '').replace(/[\r\n]+/g, ' ').trim();
+
+// The client confirmation is a published Resend template; its sender, subject and reply-to
+// are set in Resend. It takes GIVEN_NAME, PRACTICE_NAME and SUBMISSION_ID.
+const CONFIRMATION_TEMPLATE = 'hackworth-contact-confirmation';
+
+// Visitor-typed text goes into a branded email sent to the address they typed, so allow only
+// characters a name needs and cap the length (no markup, no links).
+const nameOnly = (s, max) =>
+  oneLine(s).replace(/https?:\/\/\S+|www\.\S+/gi, '').replace(/[^\p{L}\p{M}\p{N} .,'&()-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, max);
+
+const looksLikeEmail = (s) => /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(s);
+
+const sendEmail = async (apiKey, idempotencyKey, body) => {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      // Netlify can retry this function; the key stops Resend sending the same email twice.
+      'Idempotency-Key': idempotencyKey,
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
+};
 
 export const handler = async (event) => {
   const { payload } = JSON.parse(event.body || '{}');
@@ -43,28 +68,38 @@ export const handler = async (event) => {
     .join('')}</table>
 <p style="margin:16px 0 0;color:#5F6253;font-style:italic">Reply to this email to respond to the client directly.</p></div>`;
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-      // Netlify can retry this function; the key stops Resend sending the same inquiry twice.
-      'Idempotency-Key': `inquiry-${payload.id || payload.number || Date.now()}`,
-    },
-    body: JSON.stringify({
-      from: INQUIRY_FROM,
-      to: INQUIRY_TO.split(',').map((s) => s.trim()).filter(Boolean),
-      ...(replyTo && { reply_to: replyTo }),
-      subject: `New inquiry: ${name}${org ? `, ${org}` : ''}`,
-      text,
-      html,
-      tags: [{ name: 'source', value: 'website-inquiry' }],
-    }),
+  const ref = String(payload.id || payload.number || Date.now());
+
+  const notify = sendEmail(RESEND_API_KEY, `inquiry-${ref}`, {
+    from: INQUIRY_FROM,
+    to: INQUIRY_TO.split(',').map((s) => s.trim()).filter(Boolean),
+    ...(replyTo && { reply_to: replyTo }),
+    subject: `New inquiry: ${name}${org ? `, ${org}` : ''}`,
+    text,
+    html,
+    tags: [{ name: 'source', value: 'website-inquiry' }],
   });
 
-  if (!res.ok) {
-    console.error('Resend error', res.status, await res.text());
-    return { statusCode: 502, body: 'email failed' };
-  }
-  return { statusCode: 200, body: 'sent' };
+  const confirm = looksLikeEmail(replyTo)
+    ? sendEmail(RESEND_API_KEY, `confirmation-${ref}`, {
+        to: [replyTo],
+        template: {
+          id: CONFIRMATION_TEMPLATE,
+          variables: {
+            GIVEN_NAME: nameOnly(data.name, 60).split(' ')[0] || 'there',
+            PRACTICE_NAME: nameOnly(data.organization, 80) || 'your practice',
+            SUBMISSION_ID: ref.slice(-6).toUpperCase(),
+          },
+        },
+        tags: [{ name: 'source', value: 'website-confirmation' }],
+      })
+    : Promise.reject(new Error('no valid client email; confirmation skipped'));
+
+  // Send both independently, so one failing never blocks the other.
+  const [notified, confirmed] = await Promise.allSettled([notify, confirm]);
+  if (notified.status === 'rejected') console.error('Notification failed:', notified.reason.message);
+  if (confirmed.status === 'rejected') console.error('Confirmation failed:', confirmed.reason.message);
+  return notified.status === 'fulfilled'
+    ? { statusCode: 200, body: 'sent' }
+    : { statusCode: 502, body: 'notification failed' };
 };
