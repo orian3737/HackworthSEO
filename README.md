@@ -48,13 +48,14 @@ The form uses Netlify Forms (`name="inquiry"`, with a `company_website` honeypot
 
 ### Inquiry emails (Resend)
 
-`netlify/functions/submission-created.mjs` runs after every accepted `inquiry` submission and emails it through Resend, with the client's address as reply-to so you can answer in the same thread. Set these under **Site configuration → Environment variables** (scope: Functions), then redeploy:
+`netlify/functions/submission-created.mjs` runs after every accepted `inquiry` submission and emails it through Resend, with the client's address as reply-to so you can answer in the same thread. Set these under **Site configuration → Environment variables** (scope: Functions), then redeploy. Keep the actual values out of this repository: Netlify fails the build if a variable marked secret appears in any file.
+
 
 | Variable | Value |
 |---|---|
 | `RESEND_API_KEY` | A Resend API key with sending access (mark as secret) |
-| `INQUIRY_TO` | Comma-separated recipients, e.g. `info@daniel-hackworth.com,orian3737@gmail.com` |
-| `INQUIRY_FROM` | `Hackworth.exe Website <inquiries@hackworthseo.com>` |
+| `INQUIRY_TO` | Comma-separated recipient addresses |
+| `INQUIRY_FROM` | Sender name and an address on the verified domain, in the form `Name <address@hackworthseo.com>` |
 
 If an email fails, the submission is still kept under the **Forms** tab, and the error appears in the function's log under **Logs → Functions**.
 
