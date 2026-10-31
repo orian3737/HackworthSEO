@@ -1,105 +1,162 @@
-// Runs automatically after Netlify accepts a form submission (spam is filtered out first).
-// Emails each inquiry to the firm, and sends the client the Resend confirmation template. Configure in Netlify → Site configuration
-// → Environment variables: RESEND_API_KEY (secret), INQUIRY_TO (comma-separated), INQUIRY_FROM.
+// netlify/functions/submission-created.mjs
+//
+// Netlify runs this automatically after every verified (non-spam) Netlify Forms
+// submission. For the "inquiry" form on hackworthseo.com it sends two emails
+// through Resend using the published Hackworth SEO templates:
+//
+//   1. hackworth-contact-confirmation -> the person who filled in the form
+//   2. hackworth-new-lead             -> Dan, then Ryan
+//
+// Required Netlify environment variable: RESEND_API_KEY
 
-const FIELDS = [
-  ['name', 'Name'],
-  ['organization', 'Practice or firm'],
-  ['email', 'Email'],
-  ['phone', 'Telephone'],
-  ['sector', 'Field'],
-  ['interest', 'Engagement of interest'],
-  ['message', 'Message'],
-];
+const RESEND_URL = "https://api.resend.com/emails";
 
-const escapeHtml = (s) =>
-  String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const TEMPLATE_CONFIRMATION = "hackworth-contact-confirmation";
+const TEMPLATE_NEW_LEAD = "hackworth-new-lead";
 
-// Keep header values to a single line.
-const oneLine = (s) => String(s || '').replace(/[\r\n]+/g, ' ').trim();
+const FROM_INQUIRIES = "Hackworth SEO <inquiries@hackworthseo.com>";
+const FROM_LEADS = "Hackworth SEO Leads <leads@hackworthseo.com>";
 
-// The client confirmation is a published Resend template; its sender, subject and reply-to
-// are set in Resend. It takes GIVEN_NAME, PRACTICE_NAME and SUBMISSION_ID.
-const CONFIRMATION_TEMPLATE = 'hackworth-contact-confirmation';
+// Dan first, then Ryan.
+const TEAM = ["info@daniel-hackworth.com", "orian3737@gmail.com"];
 
-// Visitor-typed text goes into a branded email sent to the address they typed, so allow only
-// characters a name needs and cap the length (no markup, no links).
-const nameOnly = (s, max) =>
-  oneLine(s).replace(/https?:\/\/\S+|www\.\S+/gi, '').replace(/[^\p{L}\p{M}\p{N} .,'&()-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, max);
+const clean = (value) => (typeof value === "string" ? value.trim() : "");
 
-const looksLikeEmail = (s) => /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(s);
+const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-const sendEmail = async (apiKey, idempotencyKey, body) => {
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
+// The confirmation goes to whatever address the visitor typed, under our brand,
+// so the visitor's own words in it are reduced to plain name characters with no
+// links or markup. Otherwise the form could be used to send branded phishing.
+const nameOnly = (value, max) =>
+  clean(value)
+    .replace(/https?:\/\/\S+|www\.\S+/gi, "")
+    .replace(/[^\p{L}\p{M}\p{N} .,'&()-]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
+
+const formatSubmittedAt = (iso) => {
+  const date = iso ? new Date(iso) : new Date();
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date) + " ET";
+};
+
+// Only include variables that have a value, so each template's fallback
+// ("Not provided", "your practice", etc.) is used for anything left blank.
+const compact = (variables) =>
+  Object.fromEntries(Object.entries(variables).filter(([, v]) => v !== ""));
+
+async function sendWithResend(apiKey, idempotencyKey, body) {
+  const response = await fetch(RESEND_URL, {
+    method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      // Netlify can retry this function; the key stops Resend sending the same email twice.
-      'Idempotency-Key': idempotencyKey,
+      "Content-Type": "application/json",
+      "Idempotency-Key": idempotencyKey,
     },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
-};
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(
+      `Resend ${response.status} for ${body.template.id}: ${JSON.stringify(result)}`
+    );
+  }
+  return result;
+}
 
 export const handler = async (event) => {
-  const { payload } = JSON.parse(event.body || '{}');
-  if (!payload || payload.form_name !== 'inquiry') return { statusCode: 200, body: 'ignored' };
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("RESEND_API_KEY is not set in Netlify environment variables.");
+    return { statusCode: 500, body: "Email is not configured." };
+  }
 
-  const { RESEND_API_KEY, INQUIRY_TO, INQUIRY_FROM } = process.env;
-  if (!RESEND_API_KEY || !INQUIRY_TO || !INQUIRY_FROM) {
-    console.error('Inquiry email not sent: RESEND_API_KEY, INQUIRY_TO or INQUIRY_FROM is not set.');
-    return { statusCode: 500, body: 'not configured' };
+  let payload;
+  try {
+    ({ payload } = JSON.parse(event.body));
+  } catch {
+    return { statusCode: 400, body: "Unreadable submission." };
+  }
+
+  if (payload?.form_name !== "inquiry") {
+    return { statusCode: 200, body: "Not the inquiry form; nothing sent." };
   }
 
   const data = payload.data || {};
-  const rows = FIELDS.filter(([key]) => data[key]).map(([key, label]) => [label, String(data[key]).trim()]);
-  const name = oneLine(data.name) || 'Website visitor';
-  const org = oneLine(data.organization);
-  const replyTo = oneLine(data.email);
 
-  const text = rows.map(([label, value]) => `${label}: ${value}`).join('\n') +
-    '\n\nReply to this email to respond to the client directly.';
-  const html = `<div style="font-family:Georgia,serif;color:#1C1B19;font-size:15px;line-height:1.6">
-<p style="margin:0 0 16px;color:#5C1A1B;font-size:18px">New inquiry from hackworthseo.com</p>
-<table cellpadding="6" style="border-collapse:collapse">${rows
-    .map(([label, value]) => `<tr><td style="vertical-align:top;color:#7A6430;white-space:nowrap">${escapeHtml(label)}</td><td style="white-space:pre-wrap">${escapeHtml(value)}</td></tr>`)
-    .join('')}</table>
-<p style="margin:16px 0 0;color:#5F6253;font-style:italic">Reply to this email to respond to the client directly.</p></div>`;
+  // Honeypot: real visitors never fill this hidden field.
+  if (clean(data.company_website)) {
+    console.log(`Honeypot filled on submission ${payload.id}; no emails sent.`);
+    return { statusCode: 200, body: "Ignored." };
+  }
 
-  const ref = String(payload.id || payload.number || Date.now());
+  const name = clean(data.name);
+  const email = clean(data.email);
+  const practice = clean(data.organization);
+  const phone = clean(data.phone);
+  const field = clean(data.sector);
+  const engagement = clean(data.interest);
+  const message = clean(data.message);
 
-  const notify = sendEmail(RESEND_API_KEY, `inquiry-${ref}`, {
-    from: INQUIRY_FROM,
-    to: INQUIRY_TO.split(',').map((s) => s.trim()).filter(Boolean),
-    ...(replyTo && { reply_to: replyTo }),
-    subject: `New inquiry: ${name}${org ? `, ${org}` : ''}`,
-    text,
-    html,
-    tags: [{ name: 'source', value: 'website-inquiry' }],
+  const submissionId = String(payload.id || Date.now());
+  const submittedAt = formatSubmittedAt(payload.created_at);
+  const hasValidEmail = isEmail(email);
+
+  const leadVariables = compact({
+    CONTACT_NAME: name,
+    PRACTICE_NAME: practice,
+    CONTACT_EMAIL: hasValidEmail ? email : "",
+    PHONE: phone,
+    FIELD: field,
+    ENGAGEMENT: engagement,
+    MESSAGE: message,
+    SUBMISSION_ID: submissionId,
+    SUBMITTED_AT: submittedAt,
   });
 
-  const confirm = looksLikeEmail(replyTo)
-    ? sendEmail(RESEND_API_KEY, `confirmation-${ref}`, {
-        to: [replyTo],
-        template: {
-          id: CONFIRMATION_TEMPLATE,
-          variables: {
-            GIVEN_NAME: nameOnly(data.name, 60).split(' ')[0] || 'there',
-            PRACTICE_NAME: nameOnly(data.organization, 80) || 'your practice',
-            SUBMISSION_ID: ref.slice(-6).toUpperCase(),
-          },
-        },
-        tags: [{ name: 'source', value: 'website-confirmation' }],
-      })
-    : Promise.reject(new Error('no valid client email; confirmation skipped'));
+  const sends = [
+    sendWithResend(apiKey, `hackworth-lead/${submissionId}`, {
+      from: FROM_LEADS,
+      to: TEAM,
+      ...(hasValidEmail ? { reply_to: email } : {}),
+      subject: `[Lead] ${practice || "New inquiry"} · Ref ${submissionId}`,
+      template: { id: TEMPLATE_NEW_LEAD, variables: leadVariables },
+    }),
+  ];
 
-  // Send both independently, so one failing never blocks the other.
-  const [notified, confirmed] = await Promise.allSettled([notify, confirm]);
-  if (notified.status === 'rejected') console.error('Notification failed:', notified.reason.message);
-  if (confirmed.status === 'rejected') console.error('Confirmation failed:', confirmed.reason.message);
-  return notified.status === 'fulfilled'
-    ? { statusCode: 200, body: 'sent' }
-    : { statusCode: 502, body: 'notification failed' };
+  if (hasValidEmail) {
+    sends.push(
+      sendWithResend(apiKey, `hackworth-confirm/${submissionId}`, {
+        from: FROM_INQUIRIES,
+        to: [email],
+        reply_to: TEAM,
+        subject: `Thank you for contacting Hackworth SEO · Ref ${submissionId}`,
+        template: {
+          id: TEMPLATE_CONFIRMATION,
+          variables: compact({
+            GIVEN_NAME: nameOnly(name, 60).split(" ")[0] || "",
+            PRACTICE_NAME: nameOnly(practice, 80),
+            SUBMISSION_ID: submissionId,
+          }),
+        },
+      })
+    );
+  }
+
+  const results = await Promise.allSettled(sends);
+  const failures = results.filter((r) => r.status === "rejected");
+
+  failures.forEach((f) => console.error(f.reason));
+  results
+    .filter((r) => r.status === "fulfilled")
+    .forEach((r) => console.log(`Sent via Resend: ${r.value.id}`));
+
+  return failures.length
+    ? { statusCode: 500, body: `${failures.length} email(s) failed; see function logs.` }
+    : { statusCode: 200, body: "Emails sent." };
 };

@@ -48,14 +48,12 @@ The form uses Netlify Forms (`name="inquiry"`, with a `company_website` honeypot
 
 ### Inquiry emails (Resend)
 
-`netlify/functions/submission-created.mjs` runs after every accepted `inquiry` submission and emails it through Resend, with the client's address as reply-to so you can answer in the same thread. Set these under **Site configuration → Environment variables** (scope: Functions), then redeploy. Keep the actual values out of this repository: Netlify fails the build if a variable marked secret appears in any file.
+`netlify/functions/submission-created.mjs` runs after every accepted `inquiry` submission and sends two emails through Resend, using templates that must be **published** in Resend:
 
+- **hackworth-new-lead** to the team, with the client as reply-to.
+- **hackworth-contact-confirmation** to the client, with the team as reply-to.
 
-| Variable | Value |
-|---|---|
-| `RESEND_API_KEY` | A Resend API key with sending access (mark as secret) |
-| `INQUIRY_TO` | Comma-separated recipient addresses |
-| `INQUIRY_FROM` | Sender name and an address on the verified domain, in the form `Name <address@hackworthseo.com>` |
+Sender addresses, recipients and template names are set at the top of the function. The only Netlify environment variable it needs is `RESEND_API_KEY` (scope: Functions, marked secret). Keep its value out of this repository: Netlify fails the build if a secret value appears in any file.
 
 If an email fails, the submission is still kept under the **Forms** tab, and the error appears in the function's log under **Logs → Functions**.
 
