@@ -46,6 +46,18 @@ The form uses Netlify Forms (`name="inquiry"`, with a `company_website` honeypot
 - **Email notifications:** in the Netlify dashboard go to **Site configuration → Forms → Form notifications → Add notification → Email**, then enter the address that should receive inquiries.
 - **Submissions** also appear under the site's **Forms** tab.
 
+### Inquiry emails (Resend)
+
+`netlify/functions/submission-created.mjs` runs after every accepted `inquiry` submission and emails it through Resend, with the client's address as reply-to so you can answer in the same thread. Set these under **Site configuration → Environment variables** (scope: Functions), then redeploy:
+
+| Variable | Value |
+|---|---|
+| `RESEND_API_KEY` | A Resend API key with sending access (mark as secret) |
+| `INQUIRY_TO` | Comma-separated recipients, e.g. `info@daniel-hackworth.com,orian3737@gmail.com` |
+| `INQUIRY_FROM` | `Hackworth.exe Website <inquiries@hackworthseo.com>` |
+
+If an email fails, the submission is still kept under the **Forms** tab, and the error appears in the function's log under **Logs → Functions**.
+
 ## Clientele
 
 The Clientele section mentions the kinds of clients the firm serves (the `.roster-list` in `index.html`), never named clients. To add a kind of client, add an `<li>` to that list. Client names must never be published.
